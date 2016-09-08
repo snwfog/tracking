@@ -3,17 +3,22 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www"
+    "start": "node ./bin/www",
+    "test": "mocha"
   },
   "dependencies": {
     "body-parser": "~1.15.1",
+    "config": "^1.21.0",
     "cookie-parser": "~1.4.3",
     "debug": "~2.2.0",
     "express": "~4.13.4",
     "hbs": "~4.0.0",
+    "js-yaml": "^3.6.1",
     "morgan": "~1.7.0",
     "node-sass-middleware": "0.8.0",
-    "serve-favicon": "~2.3.0"
+    "rsvp": "^3.2.1",
+    "serve-favicon": "~2.3.0",
+    "request": "latest"
   },
   "devDependencies": {
     "chai": "^3.5.0",

@@ -16,6 +16,9 @@
     "tests"
   ],
   "dependencies": {
-    "spectre.css": "^0.1.23"
+    "spectre.css": "^0.1.23",
+    "mocha": "~3.0.2",
+    "chai": "~3.5.0",
+    "sinon": "~1.17.5"
   }
 }
