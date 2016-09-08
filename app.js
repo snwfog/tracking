@@ -6,7 +6,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser   = require('body-parser');
 
 var routes = require('./routes/index');
-var tests = require('./routes/tests');
+var tests  = require('./routes/tests');
 
 var app = express();
 
@@ -27,7 +27,8 @@ app.use(require('node-sass-middleware')({
   sourceMap:      true
 }));
 app.use(express.static(path.join(__dirname, 'public')));
-app.use('/bower_components',  express.static(__dirname + '/bower_components'));
+app.use('/test', express.static(__dirname + '/test'));
+app.use('/bower_components', express.static(__dirname + '/bower_components'));
 
 app.use('/', routes);
 app.use('/tests', tests);

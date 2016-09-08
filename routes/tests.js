@@ -1,9 +1,8 @@
 var express = require('express');
-var router = express.Router();
+var router  = express.Router();
 
-/* GET users listing. */
-router.get('/', function(req, res, next) {
-  res.send('run all tests in mocha');
+router.get('/', function (req, res, next) {
+  res.render('tests', { layout: 'test_layout' });
 });
 
 module.exports = router;
