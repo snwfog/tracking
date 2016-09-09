@@ -1,14 +1,14 @@
 dev:
-  base_path: devsecure.eloquacorp.com
-  tracking: s%d.t.dev.eloquacorp.com
+  rainmaker:             devsecure.eloquacorp.com
+  root_domain:           dev.eloquacorp.com
   sites:
-    e10tests: 3
-    e9tests: 5
+    e10tests:            3
+    e9tests:             5
 
 qa01p03:
-  base_path: secure.p03.elqqa01.com
-  tracking: s%d.t.elqqa01.com
+  rainmaker:             secure.p03.elqqa01.com
+  root_domain:           elqqa01.com
   sites:
-    tramane9qa01pod03: 1862342680
-    tramane10qa01pod03: 952160201
+    tramane9qa01pod03:   1862342680
+    tramane10qa01pod03:  952160201
 
