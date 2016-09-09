@@ -5,11 +5,12 @@ define([ 'elqQ', 'rsvp' ], function (elq, rsvp) {
     });
 
     it('should track page', function shouldTrackPage() {
-//         var siteId               = 1862342680;
-//         var rootDomain           = 'elqqa01.com';
-//         var trackingScriptDomain = 'tracking.eloqua.com';
-//         _elqQ.push([ 'elqSetSiteId', siteId ]);
-//         _elqQ.push([ 'elqSetRootDomain', rootDomain ]);
+      var siteId               = 1862342680;
+      var rootDomain           = 'elqqa01.com';
+      var trackingScriptDomain = 'tracking.eloqua.com';
+      elq.push([ 'elqSetSiteId', siteId ]);
+      elq.push([ 'elqSetRootDomain', rootDomain ]);
+      elq.push([ 'elqTrackPageView' ]);
 
       expect(1).toEqual(1);
     });

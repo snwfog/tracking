@@ -8,7 +8,7 @@ requirejs.config({
   paths:   {
 
     lib:    '/lib',
-    test:   '/test',
+    spec:   '/spec',
     config: '/config',
 
     elqQ:           '/javascripts/elqCfg',
@@ -44,8 +44,8 @@ require([ 'elqQ', 'boot', 'yaml!config/default.yml' ], function (elqQ, boot, con
   console.info('\n████████╗██████╗  █████╗  ██████╗██╗  ██╗██╗███╗   ██╗ ██████╗     ██████╗\n╚══██╔══╝██╔══██╗██╔══██╗██╔════╝██║ ██╔╝██║████╗  ██║██╔════╝     ╚════██╗\n   ██║   ██████╔╝███████║██║     █████╔╝ ██║██╔██╗ ██║██║  ███╗     █████╔╝\n   ██║   ██╔══██╗██╔══██║██║     ██╔═██╗ ██║██║╚██╗██║██║   ██║    ██╔═══╝\n   ██║   ██║  ██║██║  ██║╚██████╗██║  ██╗██║██║ ╚████║╚██████╔╝    ███████╗\n   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝╚═╝╚═╝  ╚═══╝ ╚═════╝     ╚══════╝\n ');
 
   var specs = [
-    'test/clickstream/tpc_test',
-    'test/clickstream/fpc_test',
+    'spec/clickstream/tpc_spec',
+    'spec/clickstream/fpc_spec',
   ];
 
   require(specs, window.onload);
