@@ -18,6 +18,10 @@
   "dependencies": {
     "spectre.css": "^0.1.23",
     "requirejs": "^2.3.1",
-    "rsvp.js": "rsvp#^3.2.1"
+    "rsvp.js": "rsvp#^3.2.1",
+    "require-yaml": "^0.1.2"
+  },
+  "resolutions": {
+    "js-yaml": "^3.6.1"
   }
 }
