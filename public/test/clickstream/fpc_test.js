@@ -1,18 +1,17 @@
-define([ 'rsvp', 'elqQ' ], function (rsvp, elq) {
-  describe('Clickstream', function () {
-    describe('First party cookie', function () {
-      beforeAll(function () {
-        
-      });
-      it('should track page', function shouldTrackPage() {
+define([ 'elqQ', 'rsvp' ], function (elq, rsvp) {
+  describe('Clickstream::first party cookie', function () {
+    beforeAll(function () {
+      console.log(elq, rsvp);
+    });
+
+    it('should track page', function shouldTrackPage() {
 //         var siteId               = 1862342680;
 //         var rootDomain           = 'elqqa01.com';
 //         var trackingScriptDomain = 'tracking.eloqua.com';
 //         _elqQ.push([ 'elqSetSiteId', siteId ]);
 //         _elqQ.push([ 'elqSetRootDomain', rootDomain ]);
 
-        expect(1).toEqual(1);
-      });
+      expect(1).toEqual(1);
     });
   });
 
