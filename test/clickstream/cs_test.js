@@ -47,11 +47,20 @@ describe('Clickstream', function () {
   });
 
   context('#exec', function clickstreamExec() {
-    it('Exec should return a promise', function execShouldReturnPromise() {
+    it('#exec should return a promise', function execShouldReturnPromise() {
       expect(cs.exec()).to.respondTo('then');
     });
 
-    it('Should exec a request and contains a redirection with set cookies', function shouldExecuteRequest(done) {
+    it('#exec should be able to fake host', function execShouldFakeHost() {
+      expect(cs.exec({
+        headers: {
+          Host: 'trackinglp.com'
+        }
+      }))
+
+    });
+
+    it('#exec should issue a request and contains a redirection with set cookies', function shouldExecuteRequest(done) {
       cs
         .exec(function redirectCb(response) {
           expect(response.statusCode).to.equal(HttpStatus.MOVED_TEMPORARILY);

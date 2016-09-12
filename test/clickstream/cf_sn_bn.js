@@ -5,12 +5,16 @@ var http    = require('http');
 var fs      = require('fs');
 var request = require('request');
 
-var cs = require(process.cwd() + '/lib/clickstream');
+var Clickstream           = require(process.cwd() + '/lib/clickstream');
+var FirstPartyCookieMixin = require(process.cwd() + '/lib/clickstream/track/first_party_cookie_mixin');
 
 describe('Clickstream tracking', function () {
-  context('First party cookie', function () {
-    it('should track page', function shouldTrackPage() {
-      expect(1).to.be.eql(1, 'Unit test with mocha');
+  context('[cf_sn_bn] First party cookie with strict mode off and bluekai off', function () {
+    it('Should create a first party cookie tracking object', function shouldTrackPage() {
+      var siteId     = 3;
+      var rootDomain = config.get(`${process.env.INSTANCE || 'dev'}.root_domain`);
+      var cs         = new Clickstream(siteId, rootDomain);
+      cs.mix(FirstPartyCookieMixin);
     });
   });
 });
