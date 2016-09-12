@@ -51,15 +51,6 @@ describe('Clickstream', function () {
       expect(cs.exec()).to.respondTo('then');
     });
 
-    it('#exec should be able to fake host', function execShouldFakeHost() {
-      expect(cs.exec({
-        headers: {
-          Host: 'trackinglp.com'
-        }
-      }))
-
-    });
-
     it('#exec should issue a request and contains a redirection with set cookies', function shouldExecuteRequest(done) {
       cs
         .exec(function redirectCb(response) {
@@ -79,17 +70,16 @@ describe('Clickstream', function () {
       var expectedRedirectCounts = 1;
       var redirectCounts         = 0;
       cs
-        .exec({
-          jar:            true,
-          followRedirect: function redirectCb(resp) {
+        .execWithRedirectCallback(
+          function followRedirect(resp) {
             redirectCounts++;
             expect(redirectCounts).to.be.at.most(expectedRedirectCounts);
             return !resp.request.uri.href.endsWith('elqCookie=1');
           }
-        })
-        .then(function(resp) {
+        )
+        .then(function (resp) {
           console.log('Then handle');
-          expect(resp.headers['content-type']).to.be.equal('image/gif');
+          expect(resp.headers[ 'content-type' ]).to.be.equal('image/gif');
           expect(redirectCounts).to.be.equal(expectedRedirectCounts);
           done();
         })

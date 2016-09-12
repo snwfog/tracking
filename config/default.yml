@@ -1,6 +1,6 @@
 dev:
   rainmaker:             devsecure.eloquacorp.com
-  root_domain:           dev.eloquacorp.com
+  root_domain:           dev.eloquacorp.com # Rainmaker rootdomain
   sites:
     e10tests:            3
     e9tests:             5
