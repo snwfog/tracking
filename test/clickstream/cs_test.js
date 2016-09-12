@@ -1,4 +1,5 @@
 var expect  = require('chai').expect;
+var assert  = require('chai').assert;
 var cookie  = require('cookie');
 var url     = require('url');
 var config  = require('config');
@@ -34,7 +35,7 @@ describe('Clickstream', function () {
     });
 
     it('Should produce valid query parameters hash', function validQueryStrings() {
-      expect(cs.properties()).to.be.deep.equal({
+      expect(cs.qs()).to.be.deep.equal({
         pps:    TrackingType.ClickstreamFromImage,
         siteId: 3,
       });
@@ -70,19 +71,18 @@ describe('Clickstream', function () {
       var expectedRedirectCounts = 1;
       var redirectCounts         = 0;
       cs
-        .execWithRedirectCallback(
-          function followRedirect(resp) {
-            redirectCounts++;
-            expect(redirectCounts).to.be.at.most(expectedRedirectCounts);
-            return !resp.request.uri.href.endsWith('elqCookie=1');
-          }
-        )
+        .execWithRedirectCallback(function redirectCb(resp) {
+          redirectCounts++;
+          expect(redirectCounts).to.be.at.most(expectedRedirectCounts);
+          return !resp.request.uri.href.endsWith('elqCookie=1');
+        })
         .then(function (resp) {
-          console.log('Then handle');
+          console.log('We should be here...');
           expect(resp.headers[ 'content-type' ]).to.be.equal('image/gif');
           expect(redirectCounts).to.be.equal(expectedRedirectCounts);
           done();
         })
+        .catch(assert.fail)
         .finally(done);
     });
   });

@@ -60,11 +60,8 @@ describe('Clickstream tracking', function () {
           .mix(FirstPartyCookieMixin)
           .execWithRedirectCallback(function redirectCb(response) {
             CbCount++;
-            if (CbCount == 1) {
-              console.log(response);
-            }
-
-            return false;
+            if (CbCount == 1) { console.log(response); }
+            return true;
           })
           .then(() => {
             expect(CbCount).to.be.equal(expectedCbCount, 'Redirect should be trigger once');
