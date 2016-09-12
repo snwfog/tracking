@@ -60,7 +60,10 @@ describe('Clickstream tracking', function () {
           .mix(FirstPartyCookieMixin)
           .execWithRedirectCallback(function redirectCb(response) {
             CbCount++;
-            if (CbCount == 1) { console.log(response); }
+            if (CbCount == 1) {
+              var locationUrl302 = url.parse(response.headers.location, true, true);
+              expect(locationUrl302.query).to.have.ownProperty('elq1pcGUID');
+            }
             return true;
           })
           .then(() => {
