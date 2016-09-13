@@ -1,12 +1,14 @@
 # Dev sites
 e9tests:             &dev
-  site_id:           3
+  site_id:           5
   rainmaker:         devsecure.eloquacorp.com
   root_domain:       dev.eloquacorp.com # Rainmaker rootdomain
+  first_party_domain: trackinglp01.com
 
 e10tests:
   <<:                *dev
-  site_id:           5
+  site_id:           3
+  first_party_domain: trackinglp01.com
 
 # QA01P03 sites
 tramane9qa01pod03:   &qa01p03

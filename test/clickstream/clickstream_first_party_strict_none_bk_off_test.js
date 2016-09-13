@@ -7,34 +7,41 @@ var url     = require('url');
 var fs      = require('fs');
 var request = require('request');
 
+require('dotenv').config();
+
+var INSTANCE            = process.env.INSTANCE;
+var _ROOT_DOMAIN        = config.get(`${INSTANCE}.root_domain`);
+var _SITE_ID            = config.get(`${INSTANCE}.site_id`);
+var _FIRST_PARTY_DOMAIN = config.get(`${INSTANCE}.first_party_domain`);
+
 var Clickstream           = require(process.cwd() + '/lib/clickstream');
 var FirstPartyCookieMixin = require(process.cwd() + '/lib/track/first_party_cookie_mixin');
 
-describe('Clickstream tracking', function() {
-  context('[cf_sn_bn] First party cookie with strict mode off and bluekai off', function() {
-    var siteId     = 3;
-    var rootDomain = config.get(`${process.env.INSTANCE || 'e10tests'}.root_domain`);
+var TrackingType = require(process.cwd() + '/lib/tracking_type');
+
+describe('Clickstream tracking', function () {
+  context('[cf_sn_bn] First party cookie with strict mode off and bluekai off', function () {
     var cs;
 
     beforeEach(function beforeEach() {
-      cs = new Clickstream(siteId, rootDomain);
+      cs = new Clickstream(_SITE_ID, _ROOT_DOMAIN);
       cs
         .mix(FirstPartyCookieMixin)
-        .with(function() {
-          this.setFirstPartyDomain('first-party-domain.com');
+        .with(function () {
+          this.setFirstPartyDomain(_FIRST_PARTY_DOMAIN);
         });
     });
 
     it('should create a first party cookie tracking object', function shouldTrackPage() {
-      expect(cs.firstPartyDomain).to.equal('first-party-domain.com');
+      expect(cs.firstPartyDomain).to.equal(_FIRST_PARTY_DOMAIN);
     });
 
     it('should create proper first party cookie external track request endpoint', function properRequestEndpoint() {
       expect(cs.requestEndpoint()).to.be.equal('http://s3.t.dev.eloquacorp.com/visitor/v200/svrGP');
       expect(cs.qs()).to.deep.equal({
-        siteId:                 3,
-        pps:                    3,
-        firstPartyCookieDomain: 'first-party-domain.com',
+        siteId:                 _SITE_ID,
+        pps:                    TrackingType.ClickstreamFromImage,
+        firstPartyCookieDomain: _FIRST_PARTY_DOMAIN
       });
     });
 
@@ -76,12 +83,12 @@ describe('Clickstream tracking', function() {
 });
 
 function saveToTmp(url, filename, done) {
-  return new rsvp.Promise(function(resolve, reject) {
+  return new rsvp.Promise(function (resolve, reject) {
     console.log('Saving ' + url + ' to ' + 'tmp/' + filename);
     var tmpFile = fs.createWriteStream('./test/tmp/' + filename);
     tmpFile.write('/* ' + (new Date()) + ' */ ');
     request.get(url)
-      .on('response', function() {
+      .on('response', function () {
         done();
         resolve(filename);
       })
