@@ -67,12 +67,13 @@ describe('Clickstream tracking', function () {
         return cs
           .mix(FirstPartyCookieMixin)
           .execWithRedirectCallback(function redirectCb(response) {
-            CbCount++;
-            if (CbCount == 1) {
-              var locationUrl302 = url.parse(response.headers.location, true, true);
-              expect(locationUrl302.query).to.have.ownProperty('elq1pcGUID');
-            }
-            return true;
+              CbCount++;
+              if (CbCount == 1) {
+                var locationUrl302 = url.parse(response.headers.location, true, true);
+                expect(locationUrl302.query).to.have.ownProperty('elq1pcGUID');
+              }
+              return true;
+            }, { headers: { 'x-forwarded-for': faker.internet.ip(), }
           })
           .then(() => {
             expect(CbCount).to.be.equal(expectedCbCount, 'Redirect should be trigger once');

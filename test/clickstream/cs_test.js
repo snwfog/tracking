@@ -31,56 +31,57 @@ describe('Clickstream', function () {
   beforeEach(function () {
     cs = new Clickstream(SITE_ID, ROOT_DOMAIN);
   });
-//
-//   context('Properties', function () {
-//
-//     it('should produce valid root domain', function validRootDomain() {
-//       expect(cs.elqRootDomain).to.be.equal('s3.t.dev.eloquacorp.com');
-//     });
-//
-//     it('should produce valid query parameters hash', function validQueryStrings() {
-//       expect(cs.qs()).to.be.deep.equal({
-//         pps:    TrackingType.ClickstreamFromImage,
-//         siteId: SITE_ID,
-//       });
-//     });
-//
-//     it('should produce a valid page view track url', function validRequestEndpoint() {
-//       expect(cs.requestEndpoint()).to
-//         .equal('http://s3.t.dev.eloquacorp.com/visitor/v200/svrGP');
-//     });
-//   });
+
+  context('Properties', function () {
+    it('should produce valid root domain', function validRootDomain() {
+      expect(cs.elqRootDomain).to.be.equal('s3.t.dev.eloquacorp.com');
+    });
+
+    it('should produce valid query parameters hash', function validQueryStrings() {
+      expect(cs.qs()).to.be.deep.equal({
+        pps:    TrackingType.ClickstreamFromImage,
+        siteId: SITE_ID,
+      });
+    });
+
+    it('should produce a valid page view track url', function validRequestEndpoint() {
+      expect(cs.requestEndpoint()).to
+        .equal('http://s3.t.dev.eloquacorp.com/visitor/v200/svrGP');
+    });
+  });
 
   context('#exec', function clickstreamExec() {
-//     it('should return a promise', function execShouldReturnPromise() {
-//       expect(cs.exec()).to.respondTo('then');
-//     });
+    it('should return a promise', function execShouldReturnPromise() {
+      expect(cs.exec()).to.respondTo('then');
+    });
 
-//     it('should issue a request and contains a redirection with set cookies', function shouldExecuteRequest() {
-//       return cs
-//         .exec(function redirectCb(response) {
-//           expect(response.statusCode).to.equal(HttpStatus.MOVED_TEMPORARILY);
-//           var cookies = _.map(response.headers[ 'set-cookie' ], (strCookie) => cookie.parse(strCookie));
-//           expect(cookies).to.have.lengthOf(2);
-//
-//           var eloquaAndEloquaStatus = _.reduce(cookies, (ac, c) => _.xor(_.keys(c), ac), []);
-//           expect(eloquaAndEloquaStatus).to.include.members([ 'ELOQUA', 'ELQSTATUS' ]);
-//           expect(response.headers[ 'location' ]).to.contains('elqCookie=1');
-//         });
-//     });
+    it('should issue a request and contains a redirection with set cookies', function shouldExecuteRequest() {
+      var ipAddress = faker.internet.ip();
+      return cs
+        .execWithRedirectCallback(function redirectCb(response) {
+          expect(response.statusCode).to.equal(HttpStatus.MOVED_TEMPORARILY);
+          var cookies = _.map(response.headers[ 'set-cookie' ], (strCookie) => cookie.parse(strCookie));
+          expect(cookies).to.have.lengthOf(2);
+
+          var eloquaAndEloquaStatus = _.reduce(cookies, (ac, c) => _.xor(_.keys(c), ac), []);
+          expect(eloquaAndEloquaStatus).to.include.members([ 'ELOQUA', 'ELQSTATUS' ]);
+          expect(response.headers[ 'location' ]).to.contains('elqCookie=1');
+          return false;
+        }, { headers: { 'x-forwarded-for': ipAddress, }});
+    });
 
     // TODO: This test is doing too much, need refactor
     it('should issue request and should follow redirect with elqCookie set to 1', function shouldFollowRedirect() {
       var expectedRedirectCounts = 1;
       var redirectCounts         = 0;
+      var ipAddress = faker.internet.ip();
       return cs
-        .execWithRedirectCallback(
-          { headers: { 'x-forwarded-for': faker.internet.ip(), } },
-          function redirectCb(resp) {
+        .execWithRedirectCallback(function redirectCb(resp) {
             redirectCounts++;
             expect(redirectCounts).to.be.at.most(expectedRedirectCounts);
             return !resp.request.uri.href.endsWith('elqCookie=1');
-          })
+          }, { headers: { 'x-forwarded-for': ipAddress, }
+        })
         .then(function (resp) {
           expect(resp.headers[ 'content-type' ]).to.be.equal('image/gif');
           expect(redirectCounts).to.be.equal(expectedRedirectCounts);
