@@ -1,14 +1,20 @@
-dev:
-  rainmaker:             devsecure.eloquacorp.com
-  root_domain:           dev.eloquacorp.com # Rainmaker rootdomain
-  sites:
-    e10tests:            3
-    e9tests:             5
+# Dev sites
+e9tests:             &dev
+  site_id:           3
+  rainmaker:         devsecure.eloquacorp.com
+  root_domain:       dev.eloquacorp.com # Rainmaker rootdomain
 
-qa01p03:
-  rainmaker:             secure.p03.elqqa01.com
-  root_domain:           elqqa01.com
-  sites:
-    tramane9qa01pod03:   1862342680
-    tramane10qa01pod03:  952160201
+e10tests:
+  <<:                *dev
+  site_id:           5
+
+# QA01P03 sites
+tramane9qa01pod03:   &qa01p03
+  site_id:           1862342680
+  rainmaker:         secure.p03.elqqa01.com
+  root_domain:       elqqa01.com
+
+tramane10qa01p03:
+  <<:                *qa01p03
+  site_id:           952160201
 

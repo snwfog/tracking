@@ -1,6 +1,5 @@
 var rsvp    = require('rsvp');
 var expect  = require('chai').expect;
-var assert  = require('chai').assert;
 var faker   = require('faker');
 var config  = require('config');
 var http    = require('http');
@@ -14,7 +13,7 @@ var FirstPartyCookieMixin = require(process.cwd() + '/lib/track/first_party_cook
 describe('Clickstream tracking', function() {
   context('[cf_sn_bn] First party cookie with strict mode off and bluekai off', function() {
     var siteId     = 3;
-    var rootDomain = config.get(`${process.env.INSTANCE || 'dev'}.root_domain`);
+    var rootDomain = config.get(`${process.env.INSTANCE || 'e10tests'}.root_domain`);
     var cs;
 
     beforeEach(function beforeEach() {
