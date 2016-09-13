@@ -52,8 +52,8 @@ describe('Clickstream', function () {
       expect(cs.exec()).to.respondTo('then');
     });
 
-    it('#exec should issue a request and contains a redirection with set cookies', function shouldExecuteRequest(done) {
-      cs
+    it('#exec should issue a request and contains a redirection with set cookies', function shouldExecuteRequest() {
+      return cs
         .exec(function redirectCb(response) {
           expect(response.statusCode).to.equal(HttpStatus.MOVED_TEMPORARILY);
           var cookies = _.map(response.headers[ 'set-cookie' ], (strCookie) => cookie.parse(strCookie));
@@ -62,28 +62,24 @@ describe('Clickstream', function () {
           var eloquaAndEloquaStatus = _.reduce(cookies, (ac, c) => _.xor(_.keys(c), ac), []);
           expect(eloquaAndEloquaStatus).to.include.members([ 'ELOQUA', 'ELQSTATUS' ]);
           expect(response.headers[ 'location' ]).to.contains('elqCookie=1');
-        }).finally(done);
+        });
     });
 
     // TODO: This test is doing too much, need refactor
-    it('Should exec a request and should follow redirect with elqCookie set to 1', function shouldFollowRedirect(done) {
+    it('Should exec a request and should follow redirect with elqCookie set to 1', function shouldFollowRedirect() {
       this.timeout(5000);
       var expectedRedirectCounts = 1;
       var redirectCounts         = 0;
-      cs
+      return cs
         .execWithRedirectCallback(function redirectCb(resp) {
           redirectCounts++;
           expect(redirectCounts).to.be.at.most(expectedRedirectCounts);
           return !resp.request.uri.href.endsWith('elqCookie=1');
         })
         .then(function (resp) {
-          console.log('We should be here...');
           expect(resp.headers[ 'content-type' ]).to.be.equal('image/gif');
           expect(redirectCounts).to.be.equal(expectedRedirectCounts);
-          done();
-        })
-        .catch(assert.fail)
-        .finally(done);
+        });
     });
   });
 });
