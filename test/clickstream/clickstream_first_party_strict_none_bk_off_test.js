@@ -1,5 +1,6 @@
 var rsvp    = require('rsvp');
 var expect  = require('chai').expect;
+var assert  = require('chai').assert;
 var faker   = require('faker');
 var config  = require('config');
 var http    = require('http');
@@ -10,8 +11,8 @@ var request = require('request');
 var Clickstream           = require(process.cwd() + '/lib/clickstream');
 var FirstPartyCookieMixin = require(process.cwd() + '/lib/track/first_party_cookie_mixin');
 
-describe('Clickstream tracking', function () {
-  context('[cf_sn_bn] First party cookie with strict mode off and bluekai off', function () {
+describe('Clickstream tracking', function() {
+  context('[cf_sn_bn] First party cookie with strict mode off and bluekai off', function() {
     var siteId     = 3;
     var rootDomain = config.get(`${process.env.INSTANCE || 'dev'}.root_domain`);
     var cs;
@@ -20,7 +21,7 @@ describe('Clickstream tracking', function () {
       cs = new Clickstream(siteId, rootDomain);
       cs
         .mix(FirstPartyCookieMixin)
-        .with(function () {
+        .with(function() {
           this.setFirstPartyDomain('first-party-domain.com');
         });
     });
@@ -53,10 +54,11 @@ describe('Clickstream tracking', function () {
         expect(cs.qs()).to.have.property('firstPartyCookieDomain', host);
       });
 
-      it('should make a request and first response contain a redirect', function firstResponse(done) {
+      it('should make a request and first response contain a redirect', function firstResponse() {
         var expectedCbCount = 1;
         var CbCount         = 0;
-        cs
+
+        return cs
           .mix(FirstPartyCookieMixin)
           .execWithRedirectCallback(function redirectCb(response) {
             CbCount++;
@@ -69,19 +71,18 @@ describe('Clickstream tracking', function () {
           .then(() => {
             expect(CbCount).to.be.equal(expectedCbCount, 'Redirect should be trigger once');
           })
-          .finally(done);
       });
     });
   });
 });
 
 function saveToTmp(url, filename, done) {
-  return new rsvp.Promise(function (resolve, reject) {
+  return new rsvp.Promise(function(resolve, reject) {
     console.log('Saving ' + url + ' to ' + 'tmp/' + filename);
     var tmpFile = fs.createWriteStream('./test/tmp/' + filename);
     tmpFile.write('/* ' + (new Date()) + ' */ ');
     request.get(url)
-      .on('response', function () {
+      .on('response', function() {
         done();
         resolve(filename);
       })
