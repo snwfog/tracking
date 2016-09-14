@@ -67,20 +67,21 @@ describe('Clickstream', function () {
           expect(eloquaAndEloquaStatus).to.include.members([ 'ELOQUA', 'ELQSTATUS' ]);
           expect(response.headers[ 'location' ]).to.contains('elqCookie=1');
           return false;
-        }, { headers: { 'x-forwarded-for': ipAddress, }});
+        }, { headers: { 'x-forwarded-for': ipAddress, } });
     });
 
     // TODO: This test is doing too much, need refactor
     it('should issue request and should follow redirect with elqCookie set to 1', function shouldFollowRedirect() {
       var expectedRedirectCounts = 1;
       var redirectCounts         = 0;
-      var ipAddress = faker.internet.ip();
+      var ipAddress              = faker.internet.ip();
       return cs
         .execWithRedirectCallback(function redirectCb(resp) {
-            redirectCounts++;
-            expect(redirectCounts).to.be.at.most(expectedRedirectCounts);
-            return !resp.request.uri.href.endsWith('elqCookie=1');
-          }, { headers: { 'x-forwarded-for': ipAddress, }
+          redirectCounts++;
+          expect(redirectCounts).to.be.at.most(expectedRedirectCounts);
+          return !resp.request.uri.href.endsWith('elqCookie=1');
+        }, {
+          headers: { 'x-forwarded-for': ipAddress, }
         })
         .then(function (resp) {
           expect(resp.headers[ 'content-type' ]).to.be.equal('image/gif');
