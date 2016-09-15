@@ -1,5 +1,4 @@
 var expect  = require('chai').expect;
-var assert  = require('chai').assert;
 var cookie  = require('cookie');
 var url     = require('url');
 var http    = require('http');
@@ -17,24 +16,28 @@ var ROOT_DOMAIN        = config.get(`${INSTANCE}.root_domain`);
 var SITE_ID            = config.get(`${INSTANCE}.site_id`);
 var FIRST_PARTY_DOMAIN = config.get(`${INSTANCE}.first_party_domain`);
 
-var HttpStatus         = require('http-status-codes');
-var TrackingType       = require(process.cwd() + '/lib/tracking_type');
-var Clickstream        = require(process.cwd() + '/lib/clickstream');
-var TrackPageViewMixin = require(process.cwd() + '/lib/track/track_page_view_mixin');
+var HttpStatus   = require('http-status-codes');
+var TrackingType = require(process.cwd() + '/lib/tracking_type');
+var Clickstream  = require(process.cwd() + '/lib/clickstream');
 
 /**
  * Test for Clickstream library
  */
-describe('Clickstream', function () {
+describe('Clickstream', function() {
   var cs;
 
-  beforeEach(function () {
-    cs = new Clickstream(SITE_ID, ROOT_DOMAIN);
+  beforeEach(function() {
+    cs = new Clickstream(SITE_ID, ROOT_DOMAIN, { isolated: true });
   });
 
-  context('Properties', function () {
+  context('Properties', function() {
     it('should produce valid root domain', function validRootDomain() {
       expect(cs.elqRootDomain).to.be.equal('s3.t.dev.eloquacorp.com');
+    });
+
+    it('should produce a valid page view track url', function validRequestEndpoint() {
+      expect(cs.requestEndpoint()).to
+        .equal(`http://s${SITE_ID}.t.${ROOT_DOMAIN}/visitor/v200/svrGP`);
     });
 
     it('should produce valid query parameters hash', function validQueryStrings() {
@@ -44,9 +47,19 @@ describe('Clickstream', function () {
       });
     });
 
-    it('should produce a valid page view track url', function validRequestEndpoint() {
-      expect(cs.requestEndpoint()).to
-        .equal('http://s3.t.dev.eloquacorp.com/visitor/v200/svrGP');
+    context('opts', function options() {
+      context('isolated context x-forwarded-for', function() {
+        it('should not have x-forwarded-for-header if not isolated', function shouldNotForwardIp() {
+          cs = new Clickstream(SITE_ID, ROOT_DOMAIN);
+          expect(cs.defaultRequestOpts.headers).to.be.empty;
+        });
+
+        it('should allow isolated and global mode, which would change ip on every request', function supportIsolatedOrGlobal() {
+          var cs1 = new Clickstream(SITE_ID, ROOT_DOMAIN, { isolated: true });
+          var cs2 = new Clickstream(SITE_ID, ROOT_DOMAIN, { isolated: true });
+          expect(cs1.defaultRequestOpts).to.not.deep.equal(cs2.defaultRequestOpts);
+        });
+      });
     });
   });
 
@@ -56,37 +69,46 @@ describe('Clickstream', function () {
     });
 
     it('should issue a request and contains a redirection with set cookies', function shouldExecuteRequest() {
-      var ipAddress = faker.internet.ip();
       return cs
         .execWithRedirectCallback(function redirectCb(response) {
           expect(response.statusCode).to.equal(HttpStatus.MOVED_TEMPORARILY);
-          var cookies = _.map(response.headers[ 'set-cookie' ], (strCookie) => cookie.parse(strCookie));
+          var cookies = _.map(response.headers['set-cookie'], (strCookie) => cookie.parse(strCookie));
           expect(cookies).to.have.lengthOf(2);
 
           var eloquaAndEloquaStatus = _.reduce(cookies, (ac, c) => _.xor(_.keys(c), ac), []);
-          expect(eloquaAndEloquaStatus).to.include.members([ 'ELOQUA', 'ELQSTATUS' ]);
-          expect(response.headers[ 'location' ]).to.contains('elqCookie=1');
+          expect(eloquaAndEloquaStatus).to.include.members(['ELOQUA', 'ELQSTATUS']);
+          expect(response.headers['location']).to.contains('elqCookie=1');
           return false;
-        }, { headers: { 'x-forwarded-for': ipAddress, } });
-    });
-
-    // TODO: This test is doing too much, need refactor
-    it('should issue request and should follow redirect with elqCookie set to 1', function shouldFollowRedirect() {
-      var expectedRedirectCounts = 1;
-      var redirectCounts         = 0;
-      var ipAddress              = faker.internet.ip();
-      return cs
-        .execWithRedirectCallback(function redirectCb(resp) {
-          redirectCounts++;
-          expect(redirectCounts).to.be.at.most(expectedRedirectCounts);
-          return !resp.request.uri.href.endsWith('elqCookie=1');
-        }, {
-          headers: { 'x-forwarded-for': ipAddress, }
-        })
-        .then(function (resp) {
-          expect(resp.headers[ 'content-type' ]).to.be.equal('image/gif');
-          expect(redirectCounts).to.be.equal(expectedRedirectCounts);
         });
     });
+
+    it('should have at most 1 redirect', function shouldHaveOneRedirect() {
+      var expectedRedirectCounts = 1;
+      var redirectCounts         = 0;
+      return cs
+        .execWithRedirectCallback(function redirectCb() {
+          redirectCounts++;
+          return true;
+        })
+        .then(function() {
+          expect(redirectCounts).to.be.at.most(expectedRedirectCounts);
+        });
+    });
+
+    it('should issue request with redirect containing elqCookie set to 1', function shouldFollowRedirect() {
+      return cs.execWithRedirectCallback(function redirectCb(resp) {
+        expect(resp.uri.href).to.match(/elqCookie=1$/);
+        return true;
+      });
+    });
+
+    it('should return an image gif content type', function shouldHaveGif() {
+      return cs.exec().then(function(resp) {
+        expect(resp.headers).to.have.property('content-type', 'image/gif');
+      });
+    });
+  });
+
+  context('#execWithRedirectCallback', function execWithRedirectCallbackContext() {
   });
 });
