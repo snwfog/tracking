@@ -7,14 +7,14 @@ var config  = require('config');
 var request = require('request').defaults({ jar: true });
 var jsface  = require('jsface');
 var faker   = require('faker');
+var sinon   = require('sinon');
 var _       = require('lodash');
 
 require('dotenv').config();
 
-var INSTANCE           = process.env.INSTANCE;
-var ROOT_DOMAIN        = config.get(`${INSTANCE}.root_domain`);
-var SITE_ID            = config.get(`${INSTANCE}.site_id`);
-var FIRST_PARTY_DOMAIN = config.get(`${INSTANCE}.first_party_domain`);
+var cfg         = config.get(process.env.INSTANCE);
+var ROOT_DOMAIN = cfg.get('root_domain');
+var SITE_ID     = cfg.get('site_id');
 
 var HttpStatus   = require('http-status-codes');
 var TrackingType = require(process.cwd() + '/lib/tracking_type');
@@ -63,11 +63,7 @@ describe('Clickstream', function() {
     });
   });
 
-  context('#exec', function clickstreamExec() {
-    it('should return a promise', function execShouldReturnPromise() {
-      expect(cs.exec()).to.respondTo('then');
-    });
-
+  context('cs', function cs() {
     it('should issue a request and contains a redirection with set cookies', function shouldExecuteRequest() {
       return cs
         .execWithRedirectCallback(function redirectCb(response) {
@@ -109,6 +105,31 @@ describe('Clickstream', function() {
     });
   });
 
+  context('#exec', function clickstreamExec() {
+    it('should return a promise', function execShouldReturnPromise() {
+      expect(cs.exec()).to.respondsTo('then');
+    });
+  });
+
   context('#execWithRedirectCallback', function execWithRedirectCallbackContext() {
+    it('should return a promise', function shouldReturnAPromise() {
+      var cb = sinon.spy();
+      expect(cs.execWithRedirectCallback(cb, {})).to.respondsTo('then');
+    });
+
+    it('should call exec once only', function shouldCallExecOnceOnly() {
+      sinon.spy(cs, 'exec');
+      var cb = sinon.spy();
+      cs.execWithRedirectCallback(cb, {});
+      expect(cs.exec.calledOnce).to.be.true;
+    });
+
+    it('should call exec with merged opts', function shouldCallExecWithMergedArgs() {
+      sinon.spy(cs, 'exec');
+      var cb = sinon.spy();
+      var headers = { headers: { 'hola': 'como esta?' } };
+      cs.execWithRedirectCallback(cb, headers);
+      expect(cs.exec.calledWithExactly(sinon.match(_.merge({ followRedirect: cb }, headers)))).to.be.true;
+    });
   });
 });
